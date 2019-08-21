@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<style type="text/css">
+			*{
+				padding: 0;
+				margin: 0;
+			}
+			.fix:after {
+				content: '';
+				display: block;
+				clear: both;
+			}
+			.window {
+				position: relative;
+				left: 40%;
+				margin-top: 100px;
+				width: 400px;
+				overflow: hidden;
+			}
+			.window > #leftClick {
+				position: absolute;
+				left: 0;
+				top: 50%;
+				padding: 10px 10px;
+			}
+			.window > #rightClick {
+				position: absolute;
+				right: 0;
+				top: 50%;
+				padding: 10px 10px;
+			}
+			.window > .box {
+				width: 2800px;
+				/* transform: translateX(-400px); */
+			}
+			.window > .activeDiv {
+				transition: all 1s;
+			}
+			.window > .box > div {
+				float: left;
+			}
+			.window > #btn {
+				text-align: center;
+			}
+			.window > #btn > .active {
+				background: red;
+			}
+			.window > #btn > button {
+				padding: 0 10px;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="window fix">
+			<div class="box fix activeDiv" id="box">
+				<!-- <div>
+					<img src="img/5.png" >
+				</div> -->
+				<div>
+					<img src="img/1.png" >
+				</div>
+				<div>
+					<img src="img/2.png" >
+				</div>
+				<div>
+					<img src="img/3.png" >
+				</div>
+				<div>
+					<img src="img/4.png" >
+				</div>
+				<div>
+					<img src="img/5.png" >
+				</div>
+				<div>
+					<img src="img/1.png" >
+				</div>
+			</div>
+			<button id="leftClick">-</button>
+			<button id="rightClick">+</button>
+			<div id="btn">
+				<button class="active">1</button>
+				<button>2</button>
+				<button>3</button>
+				<button>4</button>
+				<button>5</button>
+			</div>
+		</div>
+	</body>
+	<script type="text/javascript">
+		let box = document.getElementById('box');
+		let windowBox = document.getElementsByClassName('window')[0];
+		let active = document.getElementsByClassName('activeDiv')[0];
+		let btn = document.getElementById('btn').getElementsByTagName('button');
+		let leftClick = document.getElementById('leftClick');
+		let rightClick = document.getElementById('rightClick')
+		let timer = null;
+		let index = 0;
+		let preIndex = 0;
+		
+		function changeBtn(index) {
+			for(let i = 0; i < btn.length; i++) {
+				if(btn[i].classList.contains('active')) {
+					btn[i].classList.remove('active')
+				}
+			}
+			btn[index].classList.add('active')
+		}
+		
+		function endTranslate() {
+			box.classList.remove('activeDiv')
+			box.style.transform = `translateX(0px)`
+		}
+		
+		function clickChange () {
+			let distance = null;
+			distance = index * 400
+			changeBtn.call(this, index);
+			active.style.transform = `translateX(-${distance}px)`
+		}
+		
+		function timeChange () {
+			changeBtn(index)
+			let distance = null
+			if(index === 0 && preIndex === 4) {
+				distance = (preIndex + 1) * 400;
+				active.style.transform = `translateX(-${distance}px)`
+				box.addEventListener('transitionend', endTranslate)
+			}else{
+				if(!box.classList.contains('activeDiv')) {
+					box.classList.add('activeDiv');
+				}
+				active.removeEventListener('transitionend', endTranslate);
+				distance = (index * 400);
+				active.style.transform = `translateX(-${distance}px)`
+			}
+			preIndex = index;
+		}
+		
+		leftClick.addEventListener('click', function() {
+			if(index === 0) {
+				index = 4
+			}else {
+				index --
+			}
+			clickChange.call()
+		})
+		
+		rightClick.addEventListener('click',function() {
+			if(index === 4) {
+				index = 0
+			}else {
+				index ++
+			}
+			clickChange.call()
+		})
+		
+		for(let i = 0; i < btn.length; i++) {
+			btn[i].addEventListener('click', function() {
+				index = i;
+				let distance = null;
+				distance = index * 400
+				changeBtn.call(this, index);
+				active.style.transform = `translateX(-${distance}px)`
+			})
+		}
+		
+		timer = setInterval(function() {
+			preIndex = index
+			if(index === 4) {
+				index = 0
+			}else {
+				index ++
+			}
+			timeChange();
+		},1500)
+		
+		windowBox.addEventListener('mouseover', function() {
+			clearInterval(timer);
+		})
+		
+		windowBox.addEventListener('mouseleave', function() {
+			timer = setInterval(function() {
+				preIndex = index
+				if(index === 4) {
+					index = 0
+				}else {
+					index ++
+				}
+				timeChange();
+			},1500)
+		})
+	</script>
+</html>
